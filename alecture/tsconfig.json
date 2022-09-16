@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true, // import * as React from 'react'; -> import React from 'react';
+    "sourceMap": true, 
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react",
+    "module": "esnext", 
+    "moduleResolution": "Node",
+    "target": "es5", 
+    "strict": true, // any 사용x
+    "resolveJsonModule": true, // import json 파일 허용 여부
+    "baseUrl": ".",
+    "paths": { // 절대경로 처럼 import 할 수 있다.
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"],
+      "@layouts/*": ["layouts/*"],
+      "@pages/*": ["pages/*"],
+      "@utils/*": ["utils/*"],
+      "@typings/*": ["typings/*"]
+    }
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "Node",
+      "target": "es5",
+      "esModuleInterop": true
+    }
+  }
+}
+
+// ts -> babel -> js 
+// Q. 왜 babel? 
+// css, html, img 들이 있을때 babel.. -> 모든걸 js로 변환할 수 있음
+// 편의를 위해 babel을 중간에 위치하도록 많이 사용
