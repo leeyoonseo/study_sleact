@@ -19,6 +19,7 @@
       "@typings/*": ["typings/*"]
     }
   },
+  // webpack은 ts를 인식 못하므로 설정추가 필요
   "ts-node": {
     "compilerOptions": {
       "module": "commonjs",
