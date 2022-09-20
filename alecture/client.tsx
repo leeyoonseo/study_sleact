@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from 'react-dom/client';
-import App from './layouts/App';
+import App from '@layouts/App';
+import { BrowserRouter } from "react-router-dom";
 import './index.css';
 
 const appNode = document.getElementById('app');
@@ -11,6 +12,8 @@ if (!appNode) {
 
 ReactDOM.createRoot(appNode).render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
 );

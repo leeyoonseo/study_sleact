@@ -83,6 +83,9 @@ const config: Configuration = {
     publicPath: '/dist/',
   },
   devServer: {
+    // 주소 붙고 새로고침하면 react는 알 수 없기 때문에 historyApiFallback 설정이 true여야 한다.
+    // spa는 index만 있기 때문에 주소를 알 수 없다.-> 이거에 대한 주소를 만들어주는 역할
+    // 새로고침 시에는 서버로 해당 주소가 가기때문에.. -> 서버는 메인페이지에 대한 주소만 알고 있음 
     historyApiFallback: true, // react router
     port: 3090,
     devMiddleware: { publicPath: '/dist/' },
