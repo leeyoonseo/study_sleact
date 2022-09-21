@@ -1,7 +1,12 @@
 import React, { FC } from 'react';
-import { Switch, Router, Route, Redirect } from 'react-router-dom';
-import LogIn from '@pages/Login';
-import SignUp from '@pages/SignUp';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import loadable from '@loadable/component';
+
+// 코드스플리팅 하기 => npm i @loadable/component
+// - 페이지 단위, 지금 렌더링 안되도 되는 것
+// - 서버사이드 렌더링 안되도 되는 것
+const LogIn = loadable(() => import('@pages/Login'));
+const SignUp = loadable(() => import('@pages/SignUp'));
 
 const App: FC = () => {
   return (
