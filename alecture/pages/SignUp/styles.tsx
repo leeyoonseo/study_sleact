@@ -15,11 +15,6 @@ export const Form = styled.form`
   margin: 0 auto;
   width: 400px;
   max-width: 400px;
-
-  /* @emotion/babel-plugin */
-  /* ${label} { 
-    color: red;
-  } */
 `;
 
 export const Label = styled.label`

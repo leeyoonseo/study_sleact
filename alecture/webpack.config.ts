@@ -85,6 +85,10 @@ const config: Configuration = {
     filename: '[name].js', // 결과물이 app.js, app2.js, app3.js로 나옴
     publicPath: '/dist/',
   },
+  // devServer 사용 이유
+  // 1. hot reloading
+  // 2. proxy
+  // 3. historyApiFallback
   devServer: {
     // 주소 붙고 새로고침하면 react는 알 수 없기 때문에 historyApiFallback 설정이 true여야 한다.
     // spa는 index만 있기 때문에 주소를 알 수 없다.-> 이거에 대한 주소를 만들어주는 역할
@@ -95,7 +99,7 @@ const config: Configuration = {
     static: { directory: path.resolve(__dirname) },
     proxy: {
       '/api/': {
-        target: 'http://localhost:3095',
+        target: 'http://localhost:3095', // proxy서버를 통해 :3095가 보낸것처럼 취급
         changeOrigin: true,
       },
     },

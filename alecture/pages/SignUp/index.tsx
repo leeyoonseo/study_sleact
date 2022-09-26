@@ -1,10 +1,12 @@
-import useInput from '@hooks/useInput';
-import React, { useCallback, ChangeEvent, SyntheticEvent, useState } from 'react';
+import useInput, { ChangeInputEvent } from '@hooks/useInput';
+import React, { useCallback, SyntheticEvent, useState } from 'react';
+import axios, { AxiosError } from 'axios';
+
 // css module (css를 import해서 calssName과 연결)
 // import 'styles.css';
 
 // emotion (npm i @emotion/react @emotion/styled)
-import { Form, Error, Label, Input, LinkContainer, Header, Button } from './styles';
+import { Form, Error, Label, Input, LinkContainer, Header, Button, Success } from './styles';
 
 const SignUp = () => {
   const [email, onChangeEmail, setEmail] = useInput<string>('');
@@ -13,35 +15,48 @@ const SignUp = () => {
   const [password, , setPassword] = useInput<string>(''); 
   const [passwordCheck, , setPasswordCheck] = useInput<string>('');
   const [mismatchError, setMismatchError] = useState<boolean>(false);
+  const [signUpError, setSignUpError] = useState(''); 
+  const [signUpSuccess, setSignUpSuccess] = useState(false); 
 
-  type InputElement = ChangeEvent<HTMLInputElement>;
-  // const onChangeEmail = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-  // const onChangeEmail = useCallback((e: InputElement) => {
-  //   // setEmail(e.target.value); // React.FormEvent 일때
-  //   setEmail(e.target.value);
-  // }, []);
-
-  // const onChangeNickname = useCallback((e: InputElement) => {
-  //   setNickname(e.target.value);
-  // }, []);
-
-  const onChangePassword = useCallback((e: InputElement) => {
+  const onChangePassword = useCallback((e: ChangeInputEvent) => {
     setPassword(e.target.value);
     setMismatchError(e.target.value !== passwordCheck);
   }, [passwordCheck]);
 
-  const onChangePasswordCheck = useCallback((e: InputElement) => {
+  const onChangePasswordCheck = useCallback((e: ChangeInputEvent) => {
     setPasswordCheck(e.target.value);
     setMismatchError(e.target.value !== password);
   }, [password]);
 
   const onSubmit = useCallback((e: SyntheticEvent) => {
     e.preventDefault();
+    if (!mismatchError && nickname) {
+      console.log('서버로 회원가입하기');
+      // 비동기 요청 전 state는 비워주기
+      setSignUpError('');
 
-    if (!mismatchError) {
-      console.log('서버로 회원가입하기')
+      // :3090 -> :3095
+      // axios.post('http://localhost:3095/api/users', {
+      // proxy설정 후 :3095 -> :3095 
+      axios.post('/api/users', {
+        email,
+        nickname,
+        password,
+      })
+      .then((response) => {
+        console.log('response :>> ', response);
+        setSignUpSuccess(true);
+      })
+      .catch((error: Error | AxiosError) => {
+        if (axios.isAxiosError(error))  {
+          setSignUpError(error.message);
+        } else {
+          setSignUpError(error.message);
+        }
+      })
+      .finally(() => {});
     }
-    console.log('email, nickname, password, passwordCheck :>> ', email, nickname, password, passwordCheck);
+    console.log('onSubmit :>>', email, nickname, password, passwordCheck);
   }, [email, nickname, password, passwordCheck, mismatchError]);
 
   return (
@@ -57,7 +72,13 @@ const SignUp = () => {
       <Label id="nickname-label">
         <span>닉네임</span>
         <div>
-          <Input type="text" id="nickname" name="nickname" value={nickname} onChange={onChangeNickname} />
+          <Input 
+            type="text" 
+            id="nickname" 
+            name="nickname" 
+            value={nickname} 
+            onChange={onChangeNickname} 
+          />
         </div>
       </Label>
       <Label id="password-label">
@@ -79,8 +100,8 @@ const SignUp = () => {
         </div>
         {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
         {!nickname && <Error>닉네임을 입력해주세요.</Error>}
-        {/* {signUpError && <Error>{signUpError}</Error>}
-        {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>} */}
+        {signUpError && <Error>{signUpError}</Error>}
+        {signUpSuccess && <Success>회원가입되었습니다! 로그인해주세요.</Success>}
       </Label>
       <Button type="submit">회원가입</Button>
     </Form>

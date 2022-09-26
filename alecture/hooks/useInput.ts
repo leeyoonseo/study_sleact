@@ -1,6 +1,6 @@
 import { useState, useCallback, ChangeEvent, Dispatch, SetStateAction } from 'react';
 
-type ChangeInputEvent = ChangeEvent<HTMLInputElement>; 
+export type ChangeInputEvent = ChangeEvent<HTMLInputElement>; 
 type ReturnTypes<T = any> = [T, (e: ChangeInputEvent) => void, Dispatch<SetStateAction<T>>];
 
 const useInput = <T>(initialData: T): ReturnTypes<T> => {
