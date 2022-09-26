@@ -1,14 +1,17 @@
 import useInput from '@hooks/useInput';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
-// import fetcher from '@utils/fetcher';
+import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-// import useSWR from 'swr';
+
+// swr이나 react-query나 둘중 아무거나 사용해도 무방
+import useSWR from 'swr';
 
 const LogIn = () => {
-  // const { data, error, revalidate, mutate } = useSWR('/api/users', fetcher);
-
+  // data가 존재하지 않으면 loading 중임... swr은 로딩중인것을 알 수 있음
+  const { data, error } = useSWR('/api/users', fetcher); 
+  // 주소, fetcher 함수 (이 주소를 어떻게 처리할지 정해주는 함수 -> swr은 아무역할을 안함. 주소를 fetcher로 옮겨주는 역할만함)
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -21,6 +24,9 @@ const LogIn = () => {
           '/api/users/login',
           { email, password },
           {
+            // back, front 서버 주소가 다르면(도메인이 다르면) cookie 전달이 안되는 문제 발생
+            // -> withCredentials: true로 설정하기
+            // -> 쿠키는 보통 서버가 만들고, 프론트는 저장하거나 요청이 필요할때 사용한다.
             withCredentials: true,
           },
         )
