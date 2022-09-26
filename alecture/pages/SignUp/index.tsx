@@ -1,5 +1,6 @@
 import useInput, { ChangeInputEvent } from '@hooks/useInput';
 import React, { useCallback, SyntheticEvent, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 
 // css module (css를 import해서 calssName과 연결)
@@ -107,8 +108,7 @@ const SignUp = () => {
     </Form>
     <LinkContainer>
       이미 회원이신가요?&nbsp;
-      {/* <Link to="/login">로그인 하러가기</Link> */}
-      <a href="/login">로그인 하러가기</a>
+      <Link to="/login">로그인 하러가기</Link>
     </LinkContainer>
   </div>
   );
