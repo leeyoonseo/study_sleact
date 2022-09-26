@@ -1,4 +1,5 @@
-import React, { useState, useCallback, ChangeEvent, SyntheticEvent } from 'react';
+import useInput from '@hooks/useInput';
+import React, { useCallback, ChangeEvent, SyntheticEvent, useState } from 'react';
 // css module (css를 import해서 calssName과 연결)
 // import 'styles.css';
 
@@ -6,22 +7,23 @@ import React, { useState, useCallback, ChangeEvent, SyntheticEvent } from 'react
 import { Form, Error, Label, Input, LinkContainer, Header, Button } from './styles';
 
 const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordCheck, setPasswordCheck] = useState('');
-  const [mismatchError, setMismatchError] = useState(false);
+  const [email, onChangeEmail, setEmail] = useInput<string>('');
+  const [nickname, onChangeNickname, setNickname] = useInput<string>('');
+  // 2번째 값은 일부로 커스텀 훅을 안사용하기 위해 비워둠
+  const [password, , setPassword] = useInput<string>(''); 
+  const [passwordCheck, , setPasswordCheck] = useInput<string>('');
+  const [mismatchError, setMismatchError] = useState<boolean>(false);
 
   type InputElement = ChangeEvent<HTMLInputElement>;
   // const onChangeEmail = useCallback((e: React.FormEvent<HTMLInputElement>) => {
-  const onChangeEmail = useCallback((e: InputElement) => {
-    // setEmail(e.target.value); // React.FormEvent 일때
-    setEmail(e.target.value);
-  }, []);
+  // const onChangeEmail = useCallback((e: InputElement) => {
+  //   // setEmail(e.target.value); // React.FormEvent 일때
+  //   setEmail(e.target.value);
+  // }, []);
 
-  const onChangeNickname = useCallback((e: InputElement) => {
-    setNickname(e.target.value);
-  }, []);
+  // const onChangeNickname = useCallback((e: InputElement) => {
+  //   setNickname(e.target.value);
+  // }, []);
 
   const onChangePassword = useCallback((e: InputElement) => {
     setPassword(e.target.value);
