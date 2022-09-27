@@ -1,6 +1,6 @@
 import useInput, { ChangeInputEvent } from '@hooks/useInput';
 import React, { useCallback, SyntheticEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 
 // css module (css를 import해서 calssName과 연결)
@@ -8,8 +8,11 @@ import axios, { AxiosError } from 'axios';
 
 // emotion (npm i @emotion/react @emotion/styled)
 import { Form, Error, Label, Input, LinkContainer, Header, Button, Success } from './styles';
+import useSWR from 'swr';
+import fetcher from '@utils/fetcher';
 
 const SignUp = () => {
+  const { data, error } = useSWR('/api/users', fetcher);
   const [email, onChangeEmail, setEmail] = useInput<string>('');
   const [nickname, onChangeNickname, setNickname] = useInput<string>('');
   // 2번째 값은 일부로 커스텀 훅을 안사용하기 위해 비워둠
@@ -61,6 +64,17 @@ const SignUp = () => {
     }
     console.log('onSubmit :>>', email, nickname, password, passwordCheck);
   }, [email, nickname, password, passwordCheck, mismatchError]);
+
+  if (data === undefined) { 
+    return <div>로딩중...</div>;
+  }
+  
+  // return 문이 있을 경우 아무 위치나 둘 수 없다. 
+  // -> 항상 hooks보다 아래에 존재해야 한다.
+  // -> return으로 인해 오류가 날 수 있음.
+  if (data) {
+    return <Redirect to="/workspace/channel" />;
+  }
 
   return (
     <div id="container">
