@@ -10,7 +10,16 @@ import useSWR from 'swr';
 
 const LogIn = () => {
   // data가 존재하지 않으면 loading 중임... swr은 로딩중인것을 알 수 있음
-  const { data, error } = useSWR('/api/users', fetcher); 
+  const { data, error, mutate } = useSWR('/api/users', fetcher, {
+    dedupingInterval: 100000, // default는 2초
+    // 주기적으로 호출되지만, 기간내에는 캐시에서 가져온다. 
+
+    // etc....
+    // focusThrottleInterval: 3000 // revalidate 제한
+    // errorRetryInterval: 5000 // 에러가 나도 스스로 재요청을 보내는 간격
+    // errorRetryCount: // 최대 몇번까지 요청할지
+    // loadingTimeout: 3000 // 어떤 요청 후 3초가 걸리면 알려주기위해 사용
+  }); 
   // 주소, fetcher 함수 (이 주소를 어떻게 처리할지 정해주는 함수 -> swr은 아무역할을 안함. 주소를 fetcher로 옮겨주는 역할만함)
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
@@ -30,8 +39,8 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then((response) => {
-          // revalidate();
+        .then(() => {
+          mutate(); // fetcher 실행을 조작
         })
         .catch((error) => {
           // setLogInError(error.response?.data?.statusCode === 401);
