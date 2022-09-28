@@ -2,7 +2,7 @@ import useInput from '@hooks/useInput';
 import { Success, Form, Error, Label, Input, LinkContainer, Button, Header } from '@pages/SignUp/styles';
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { MouseEvent, useCallback, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 // swr이나 react-query나 둘중 아무거나 사용해도 무방
@@ -41,7 +41,7 @@ const LogIn = () => {
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
   const onSubmit = useCallback(
-    (e: any) => {
+    (e: MouseEvent<HTMLFormElement>) => {
       e.preventDefault();
       setLogInError(false);
       axios

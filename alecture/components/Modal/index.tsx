@@ -1,8 +1,31 @@
-import React from 'react'
+import React, { FC, useCallback, MouseEvent } from 'react'
+import { CloseModalButton, CreateModal } from './styles';
 
-const Modal = () => {
+interface Props {
+  show: boolean;
+  onCloseModal: () => void;
+}
+
+const Modal: FC<React.PropsWithChildren<Props>>  = ({
+  children,
+  show,
+  onCloseModal,
+}) => {
+  const stopPropagation = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  }, []);
+
+  if(!show) {
+    return null;
+  }
+
   return (
-    <div>Modal</div>
+    <CreateModal onClick={onCloseModal}>
+      <div onClick={stopPropagation}>
+        <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>
+        {children}
+      </div>
+    </CreateModal>
   )
 };
 
