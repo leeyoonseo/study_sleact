@@ -1,7 +1,7 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { FC, useCallback } from 'react';
-import { Redirect } from 'react-router';
+import { Redirect, Route, Switch } from 'react-router';
 import useSWR from 'swr';
 // mutate 여기에 있는 것은 범용적으로 쓸 수 있는 mutate
 // -> 이럴 경우 mutate('http://localhost:3095/api/users', false); 이렇게 써야함
@@ -10,6 +10,10 @@ import useSWR from 'swr';
 
 import gravatar from 'gravatar';
 import { Channels, Chats, Header, MenuScroll, ProfileImg, RightMenu, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
+import loadable from '@loadable/component';
+
+const Channel = loadable(() => import('@pages/Channel'));
+const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
 const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
@@ -52,8 +56,21 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
           <WorkspaceName>Sleact</WorkspaceName>
           <MenuScroll>MenuScroll</MenuScroll>
         </Channels>
-        <Chats>Chats</Chats>
+        <Chats>
+          {/* 
+            컴포넌트3. 워크스페이스 안에서 라우터 
+            switch > switch할때 path에 대한 구조가 똑같아야함.
+            즉, app/index.tsx에서 path="/workspace"일 경우 하위는 계층 구조를 가져야함 (중첩 라우터)
+            -> path="/workspace/channel" 이나 path="/workspace/dm" (O)
+            -> path="/ws/channel"(X)
+          */}
+          <Switch>
+            <Route path="/workspace/channel" component={Channel} />
+            <Route path="/workspace/dm" component={DirectMessage} />
+          </Switch>
+        </Chats>
       </WorkspaceWrapper>
+      {/* 컴포넌트2. children props 사용하는 방법 */}
       {children}
     </div>
   )
