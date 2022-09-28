@@ -8,11 +8,13 @@ import { Link, Redirect } from 'react-router-dom';
 // swr이나 react-query나 둘중 아무거나 사용해도 무방
 import useSWR from 'swr';
 
+
 const LogIn = () => {
   // data가 존재하지 않으면 loading 중임... swr은 로딩중인것을 알 수 있음
   // options 알아보기
   // const { data, error, mutate } = useSWR('/api/users', fetcher, {
-  //   dedupingInterval: 100000, // default는 2초
+  //   dedupingInterval: 100000, // default는 2초 
+  //    -> 아무리 많은 useSWR 호출해도 설정한 시간에 대해서는 캐시된 데이터를 가져다 씀(여러개의 컴포넌트에서 써도..!)
   //   // 주기적으로 호출되지만, 기간내에는 캐시에서 가져온다. 
 
   //   // etc....
@@ -21,8 +23,20 @@ const LogIn = () => {
   //   // errorRetryCount: // 최대 몇번까지 요청할지
   //   // loadingTimeout: 3000 // 어떤 요청 후 3초가 걸리면 알려주기위해 사용
   // }); 
+  // mutate -> 서버에 요청 안보내고 데이터 수집
   const { data, error, mutate } = useSWR('/api/users', fetcher); 
   // 주소, fetcher 함수 (이 주소를 어떻게 처리할지 정해주는 함수 -> swr은 아무역할을 안함. 주소를 fetcher로 옮겨주는 역할만함)
+
+  // 또한 localstorage와 같이 다른 것들도 관리할 수 있다. (항상 비동기요청만 하는것이 아니다. => 전역 데이터 관리자로 사용가능)
+  // const { data } = useSWR('hello', (key) => localStorage.setItem('data', key); return localStorage.getItem(key));
+  // 다른 컴포넌트에서 아래와 같이 가져다 쓸 수 있다. -> 리덕스를 대체할 수 있다.
+  // const { data } = useSWR('hello'); 
+
+  // fetcher를 다르게 두개 쓰고 싶다?
+  // -> queryString을 붙여서 서버가 다르게 인식하도록 작업하면 가능(꼼수) -> url을 통해 다른 값인지 구분
+  // swr 쓰면 toolkit x 반대로도 그렇다
+  // const { data, error, mutate } = useSWR('/api/users#123', fetcher2); 
+
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -41,8 +55,8 @@ const LogIn = () => {
             withCredentials: true,
           },
         )
-        .then(() => {
-          mutate(); // fetcher 실행을 조작
+        .then((response) => {
+          mutate(response.data); // fetcher 실행을 조작
         })
         .catch((error) => {
           // setLogInError(error.response?.data?.statusCode === 401);
