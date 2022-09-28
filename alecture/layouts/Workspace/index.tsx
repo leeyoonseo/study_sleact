@@ -1,6 +1,6 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import useSWR from 'swr';
 // mutate 여기에 있는 것은 범용적으로 쓸 수 있는 mutate
@@ -9,8 +9,9 @@ import useSWR from 'swr';
 // import useSWR, { mutate } from 'swr';
 
 import gravatar from 'gravatar';
-import { Channels, Chats, Header, MenuScroll, ProfileImg, RightMenu, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
+import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
 import loadable from '@loadable/component';
+import Menu from '@components/Menu';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -18,6 +19,7 @@ const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   const { data, error, mutate } = useSWR('/api/users', fetcher); 
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
       withCredentials: true, // 쿠키 공유
@@ -33,6 +35,10 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
     })
   }, []);
 
+  const onClickUserProfile = useCallback(() => {
+    setShowUserMenu((prev) => !prev);
+  }, [])
+
   if (!data) {
     return <Redirect to="/login" />
   }
@@ -41,11 +47,30 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
     <div>
       <Header>
         <RightMenu>
-          <span>
+          <span onClick={onClickUserProfile}>
             <ProfileImg 
               src={gravatar.url(data.email, { s: '28px', d: 'retro' })} 
               alt={data.nickname} 
             />
+            {showUserMenu && (
+              <Menu 
+                style={{ right: 0, top: 38 }} 
+                show={showUserMenu} 
+                onCloseModal={onClickUserProfile}
+              >
+                <ProfileModal>
+                  <img 
+                    src={gravatar.url(data.email, { s: '36px', d: 'retro' })} 
+                    alt={data.nickname} 
+                  />
+                  <div>
+                    <span id="profile-name">{data.nickname}</span>
+                    <span id="profile-active">Active</span>
+                  </div>
+                </ProfileModal>
+                <LogOutButton onClick={onLogout}>로그아웃</LogOutButton>
+              </Menu>
+            )}
           </span>
         </RightMenu>  
       </Header>
@@ -71,7 +96,7 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
         </Chats>
       </WorkspaceWrapper>
       {/* 컴포넌트2. children props 사용하는 방법 */}
-      {children}
+      {/* {children} */}
     </div>
   )
 };
