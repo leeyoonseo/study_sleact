@@ -8,6 +8,9 @@ import useSWR from 'swr';
 // -> 전역 mutate가 유용한 이유? 컴포넌트 로딩될때마다 useSWR을 요청하게 되는데(1번), 이게 데이터 낭비라고 느껴지면 전역 mutate를 사용하는것
 // import useSWR, { mutate } from 'swr';
 
+import gravatar from 'gravatar';
+import { Channels, Chats, Header, MenuScroll, ProfileImg, RightMenu, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
+
 const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   const { data, error, mutate } = useSWR('/api/users', fetcher); 
@@ -32,10 +35,31 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
 
   return (
     <div>
+      <Header>
+        <RightMenu>
+          <span>
+            <ProfileImg 
+              src={gravatar.url(data.email, { s: '28px', d: 'retro' })} 
+              alt={data.nickname} 
+            />
+          </span>
+        </RightMenu>  
+      </Header>
       <button onClick={onLogout}>로그아웃</button>
+      <WorkspaceWrapper>
+        <Workspaces>test</Workspaces>
+        <Channels>
+          <WorkspaceName>Sleact</WorkspaceName>
+          <MenuScroll>MenuScroll</MenuScroll>
+        </Channels>
+        <Chats>Chats</Chats>
+      </WorkspaceWrapper>
       {children}
     </div>
   )
 };
 
 export default Workspace;
+
+// 그라바타 -> 아바타 랜덤 시스템 (이메일과 1:1 매칭?)
+// npm i gravatar @types/gravatar
