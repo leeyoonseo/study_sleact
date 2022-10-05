@@ -1,6 +1,6 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { FC, useCallback, useState } from 'react';
+import React, { MouseEvent, FC, useCallback, useState } from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import useSWR from 'swr';
 // mutate 여기에 있는 것은 범용적으로 쓸 수 있는 mutate
@@ -9,15 +9,17 @@ import useSWR from 'swr';
 // import useSWR, { mutate } from 'swr';
 
 import gravatar from 'gravatar';
-import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
-import loadable from '@loadable/component';
 import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import loadable from '@loadable/component';
 import { IUser } from '@typings/db';
 import useInput from '@hooks/useInput';
-
-import { Button, Input, Label } from '@pages/SignUp/styles';
 import Modal from '@components/Modal';
 import Menu from '@components/Menu';
+
+import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
+import { Button, Input, Label } from '@pages/SignUp/styles';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -48,13 +50,42 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
 
   const onClickUserProfile = useCallback(() => {
     setShowUserMenu((prev) => !prev);
-  }, [])
+  }, []);
+
+  // ? any 해결
+  const onCloseUserProfile = useCallback((e: any) => {
+    e.stopPropagation();
+    setShowUserMenu(false);
+  }, []);
 
   const onClickCreateWorkspace = useCallback(() => {
     setShowCreateWorkspaceModal(true);
   }, []);
 
-  const onCreateWorkspace = useCallback(() => {}, []);
+  const onCreateWorkspace = useCallback((e: MouseEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newWorkspace || !newWorkspace.trim()) return;
+    if (!newUrl || !newUrl.trim()) return;
+    if (!newWorkspace) return;
+
+    axios.post('/api/workspaces', {
+      workspace: newWorkspace,
+      url: newUrl
+    }, {
+      withCredentials: true,
+    })
+    .then(() => {
+      mutate(); // response.data, false);
+      setShowCreateWorkspaceModal(false);
+      setNewWorkspace('');
+      setNewUrl('');
+    })
+    .catch((error) => {
+      console.dir(error);
+      toast.error(error.response?.data, { position: 'bottom-center' });
+    });
+  }, [newWorkspace, newUrl]);
+
   const onCloseModal = useCallback(() => {
     setShowCreateWorkspaceModal(false);
   }, []);
@@ -76,7 +107,7 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
               <Menu 
                 style={{ right: 0, top: 38 }} 
                 show={showUserMenu} 
-                onCloseModal={onClickUserProfile}
+                onCloseModal={onCloseUserProfile}
               >
                 <ProfileModal>
                   <img 
@@ -148,11 +179,12 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
+
+      <ToastContainer />
     </div>
   )
 };
 
 export default Workspace;
-
 // 그라바타 -> 아바타 랜덤 시스템 (이메일과 1:1 매칭?)
 // npm i gravatar @types/gravatar
