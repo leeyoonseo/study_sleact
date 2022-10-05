@@ -17,19 +17,22 @@ import useInput from '@hooks/useInput';
 import Modal from '@components/Modal';
 import Menu from '@components/Menu';
 
-import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
+import { AddButton, Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceModal, WorkspaceName, Workspaces, WorkspaceWrapper } from './styles';
 import { Button, Input, Label } from '@pages/SignUp/styles';
 import 'react-toastify/dist/ReactToastify.css';
+import CreateChannelModal from '@components/CreateChannelModal';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 
-const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const Workspace: FC = () => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   // <IUser | false> -> 로그인이 안되면 false기 때문에
   const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher); 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   
@@ -86,8 +89,20 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
     });
   }, [newWorkspace, newUrl]);
 
+  // 화면에 떠있는 모든 모달을 닫는 메서드
   const onCloseModal = useCallback(() => {
     setShowCreateWorkspaceModal(false);
+    setShowCreateChannelModal(false);
+    // setShowInviteWorkspaceModal(false);
+    // setShowInviteChannelModal(false);
+  }, []);
+
+  const toggleWorkspaceModal = useCallback(() => {
+    setShowWorkspaceModal(prev => !prev);
+  }, []);
+
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal(true);
   }, []);
 
   if (!userData) {
@@ -138,8 +153,23 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName>Sleact</WorkspaceName>
-          <MenuScroll>MenuScroll</MenuScroll>
+          <WorkspaceName onClick={toggleWorkspaceModal}>
+            Sleact
+          </WorkspaceName>
+          <MenuScroll>
+            <Menu 
+              show={showWorkspaceModal} 
+              onCloseModal={toggleWorkspaceModal}
+              style={{ top: 95, left: 80 }}
+            >
+              <WorkspaceModal>
+                <h2>Sleact</h2>
+                {/* <button onClick={onClickInviteWorkspace}>워크스페이스에 사용자 초대</button> */}
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onLogout}>로그아웃</button>
+              </WorkspaceModal>
+            </Menu> 
+          </MenuScroll>
         </Channels>
         <Chats>
           {/* 
@@ -158,7 +188,10 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
       {/* 컴포넌트2. children props 사용하는 방법 */}
       {/* {children} */}
 
-      <Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>
+      <Modal 
+        show={showCreateWorkspaceModal} 
+        onCloseModal={onCloseModal}
+      >
         <form onSubmit={onCreateWorkspace}>
           <Label id="workspace-label">
             <span>워크스페이스 이름</span>
@@ -179,6 +212,12 @@ const Workspace: FC<React.PropsWithChildren<{}>> = ({ children }) => {
           <Button type="submit">생성하기</Button>
         </form>
       </Modal>
+
+      <CreateChannelModal 
+        show={showCreateChannelModal} 
+        onCloseModal={onCloseModal}
+        />
+        {/* setShowCreateChannelModal={setShowCreateChannelModal} */}
 
       <ToastContainer />
     </div>
