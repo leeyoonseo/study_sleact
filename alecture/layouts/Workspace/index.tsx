@@ -1,7 +1,7 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
 import React, { MouseEvent, FC, useCallback, useState } from 'react';
-import { Redirect, Route, Switch } from 'react-router';
+import { Redirect, Route, Switch, useParams } from 'react-router';
 import useSWR from 'swr';
 // mutate 여기에 있는 것은 범용적으로 쓸 수 있는 mutate
 // -> 이럴 경우 mutate('http://localhost:3095/api/users', false); 이렇게 써야함
@@ -12,7 +12,7 @@ import gravatar from 'gravatar';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import loadable from '@loadable/component';
-import { IUser } from '@typings/db';
+import { IChannel, IUser } from '@typings/db';
 import useInput from '@hooks/useInput';
 import Modal from '@components/Modal';
 import Menu from '@components/Menu';
@@ -28,7 +28,9 @@ const DirectMessage = loadable(() => import('@pages/DirectMessage'));
 const Workspace: FC = () => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   // <IUser | false> -> 로그인이 안되면 false기 때문에
-  const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher); 
+  const { workspace } = useParams<{workspace: string }>();
+  const { data: userData, error, mutate } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher); 
+  const { data: channelData } = useSWR<IChannel[]>(userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null, fetcher);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
@@ -36,6 +38,7 @@ const Workspace: FC = () => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   
+
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
       withCredentials: true, // 쿠키 공유
@@ -71,7 +74,7 @@ const Workspace: FC = () => {
     if (!newUrl || !newUrl.trim()) return;
     if (!newWorkspace) return;
 
-    axios.post('/api/workspaces', {
+    axios.post('http://localhost:3095/api/workspaces', {
       workspace: newWorkspace,
       url: newUrl
     }, {
@@ -169,6 +172,9 @@ const Workspace: FC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu> 
+            { channelData?.map((v, i) => (
+              <div key={i}>{v.name}</div>
+            )) }
           </MenuScroll>
         </Channels>
         <Chats>
@@ -180,8 +186,8 @@ const Workspace: FC = () => {
             -> path="/ws/channel"(X)
           */}
           <Switch>
-            <Route path="/workspace/channel" component={Channel} />
-            <Route path="/workspace/dm" component={DirectMessage} />
+            <Route path="/workspace/:workspace/channel/:channel" component={Channel} />
+            <Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />
           </Switch>
         </Chats>
       </WorkspaceWrapper>
@@ -216,8 +222,8 @@ const Workspace: FC = () => {
       <CreateChannelModal 
         show={showCreateChannelModal} 
         onCloseModal={onCloseModal}
-        />
-        {/* setShowCreateChannelModal={setShowCreateChannelModal} */}
+        setShowCreateChannelModal={setShowCreateChannelModal}
+      />
 
       <ToastContainer />
     </div>

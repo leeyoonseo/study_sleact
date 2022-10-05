@@ -73,7 +73,7 @@ const SignUp = () => {
   // -> 항상 hooks보다 아래에 존재해야 한다.
   // -> return으로 인해 오류가 날 수 있음.
   if (data) {
-    return <Redirect to="/workspace/channel" />;
+    return <Redirect to="/workspace/sleact/channel/일반" />;
   }
 
   return (
