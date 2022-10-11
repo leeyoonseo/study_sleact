@@ -182,9 +182,6 @@ const Workspace: FC = () => {
             </Menu> 
             <ChannelList />
             <DMList />
-            { channelData?.map((v, i) => (
-              <div key={i}>{v.name}</div>
-            )) }
           </MenuScroll>
         </Channels>
         <Chats>
