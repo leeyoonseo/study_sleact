@@ -65,7 +65,7 @@ const Workspace: FC = () => {
   }, []);
 
   const onClickInviteWorkspace = useCallback(() => {
-    setShowInviteWorkspaceModal(prev => !prev);
+    setShowInviteWorkspaceModal(true);
   }, []); 
 
   const onCloseUserProfile = useCallback((e: MouseEvent<HTMLDivElement>) => {
