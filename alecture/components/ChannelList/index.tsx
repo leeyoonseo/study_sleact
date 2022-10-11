@@ -7,11 +7,7 @@ import { useParams } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 
-interface Props {
-  userData?: IUser;
-}
-
-const ChannelList: FC<Props> = () => {
+const ChannelList: FC = () => {
   const { workspace } = useParams<{ workspace?: string }>();
   // const [socket] = useSocket(workspace);
   const { data: userData, error, mutate } = useSWR<IUser>('/api/users', fetcher, {

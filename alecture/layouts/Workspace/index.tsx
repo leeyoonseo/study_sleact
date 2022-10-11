@@ -180,8 +180,8 @@ const Workspace: FC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu> 
-            <ChannelList userData={userData} />
-            <DMList userData={userData} />
+            <ChannelList />
+            <DMList />
             { channelData?.map((v, i) => (
               <div key={i}>{v.name}</div>
             )) }
