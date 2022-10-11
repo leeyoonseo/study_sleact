@@ -15,24 +15,31 @@ const Workspace = loadable(() => import('@layouts/Workspace'));
 
 const App: FC = () => {
   return (
-    // Switch: 여러개 라우터 중 하나만
     <Switch>
       <Redirect exact path="/" to="/login" />
-        <Route path="/login" component={LogIn} />
-        <Route path="/signup" component={SignUp} />
-        {/* main router를 가져오고 workspace 내에서 또 route를 통해 페이지 구분 */}
-        <Route path="/workspace/:workspace" component={Workspace} />
-
-        {/*
-          파라미터와 아닌 path가 있을때, 반드시 일반 path를 가진 Route가 위에 와야한다.  
-          위에서 부터 아래로 실행되기 때문에 sleact가 하위에 있을 경우 접근이 안된다.
-          -> 무조건 :workspace가 가져가기 때문
-        */}
-        {/* <Route path="/workspace/sleact" component={Workspace} /> */}
-        {/* 라우트 파라미터 /:workspace/ -> 다이나믹라우트 */}
-        {/* <Route path="/workspace/:workspace" component={Workspace} />  */}
-        
+      <Route path="/login" component={LogIn} />
+      <Route path="/signup" component={SignUp} />
+      <Route path="/workspace/:workspace" component={Workspace} />
     </Switch>
+    
+    // Switch: 여러개 라우터 중 하나만
+    // <Switch>
+    //   <Redirect exact path="/" to="/login" />
+    //     <Route path="/login" component={LogIn} />
+    //     <Route path="/signup" component={SignUp} />
+    //     {/* main router를 가져오고 workspace 내에서 또 route를 통해 페이지 구분 */}
+    //     <Route path="/workspace/:workspace" component={Workspace} />
+
+    //     {/*
+    //       파라미터와 아닌 path가 있을때, 반드시 일반 path를 가진 Route가 위에 와야한다.  
+    //       위에서 부터 아래로 실행되기 때문에 sleact가 하위에 있을 경우 접근이 안된다.
+    //       -> 무조건 :workspace가 가져가기 때문
+    //     */}
+    //     {/* <Route path="/workspace/sleact" component={Workspace} /> */}
+    //     {/* 라우트 파라미터 /:workspace/ -> 다이나믹라우트 */}
+    //     {/* <Route path="/workspace/:workspace" component={Workspace} />  */}
+        
+    // </Switch>
   );
 };
 

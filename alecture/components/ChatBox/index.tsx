@@ -2,11 +2,11 @@ import React, { FC, MouseEvent, useCallback, KeyboardEvent, useEffect, useRef } 
 import { ChatArea, Form, MentionsTextarea, SendButton, Toolbox } from './styles';
 import autosize from 'autosize';
 
-type SubmitFormEvent = MouseEvent<HTMLFormElement> | KeyboardEvent<HTMLFormElement>;
+// type SubmitFormEvent = MouseEvent<HTMLFormElement> | KeyboardEvent<HTMLFormElement>;
 
 interface Props {
   chat: string;
-  onSubmitForm: (e: SubmitFormEvent) => void;
+  onSubmitForm: (e: any) => void;
   onChangeChat: (e: any) => void;
   placeholder?: string;
 }
@@ -20,13 +20,14 @@ const ChatBox: FC<Props>= ({ chat, onSubmitForm, onChangeChat, placeholder }) =>
     }
   }, []);
 
-  const onKeydownChat = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const onKeydownChat = useCallback((e: any) => {
+    console.log(e)
     if (e.key === 'Enter') {
       if (!e.shiftKey) {
-        onSubmitForm(e as unknown as KeyboardEvent<HTMLFormElement>);
+        onSubmitForm(e);
       }
     }
-  }, []);
+  }, [onSubmitForm]);
 
   return (
     <ChatArea>

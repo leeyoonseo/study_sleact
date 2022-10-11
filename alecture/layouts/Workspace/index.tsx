@@ -57,7 +57,7 @@ const Workspace: FC = () => {
       // 기본적으로 두지 않으면 pessimistic ui (서버 성공 후 ui 변경)
       // false면 걍 서버요청안하고 로컬 데이터 수정
       mutate(response.data, false);
-    })
+    });
   }, []);
 
   const onClickUserProfile = useCallback(() => {
@@ -154,12 +154,12 @@ const Workspace: FC = () => {
       </Header>
       <WorkspaceWrapper>
         <Workspaces>
-          {userData?.Workspaces.map(ws => {
+          {userData?.Workspaces.map((ws) => {
             return (
               <Link key={ws.id} to={`/workspace/${123}/channel/일반`}>
                 <WorkspaceButton>{ws.name.slice(0, 1).toUpperCase()}</WorkspaceButton>
               </Link>
-            )
+            );
           })}
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
         </Workspaces>
@@ -192,10 +192,12 @@ const Workspace: FC = () => {
             -> path="/workspace/channel" 이나 path="/workspace/dm" (O)
             -> path="/ws/channel"(X)
           */}
-          <Switch>
-            <Route path="/workspace/:workspace/channel/:channel" component={Channel} />
-            <Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />
-          </Switch>
+          <Chats>
+            <Switch>
+              <Route path="/workspace/:workspace/channel/:channel" component={Channel} />
+              <Route path="/workspace/:workspace/dm/:id" component={DirectMessage} />
+            </Switch>
+          </Chats>
         </Chats>
       </WorkspaceWrapper>
       {/* 컴포넌트2. children props 사용하는 방법 */}

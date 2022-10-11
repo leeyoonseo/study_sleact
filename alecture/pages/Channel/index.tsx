@@ -4,11 +4,11 @@ import ChatList from '@components/ChatList';
 import useInput from '@hooks/useInput';
 import { Container, Header } from './styles';
 
-type SubmitFormEvent = MouseEvent<HTMLFormElement> | KeyboardEvent<HTMLFormElement>;
+// type SubmitFormEvent = MouseEvent<HTMLFormElement> | KeyboardEvent<HTMLFormElement>;
 
 const Channel = () => {
   const [chat, onChangeChat, setChat] = useInput('');
-  const onSubmitForm = useCallback((e: SubmitFormEvent) => {
+  const onSubmitForm = useCallback((e: any) => {
     e.preventDefault();
     setChat('');
   }, []);
