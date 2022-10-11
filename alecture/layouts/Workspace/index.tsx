@@ -23,6 +23,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import CreateChannelModal from '@components/CreateChannelModal';
 import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
+import ChannelList from '@components/ChannelList';
+import DMList from '@components/DMList';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -31,8 +33,9 @@ const Workspace: FC = () => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   // <IUser | false> -> 로그인이 안되면 false기 때문에
   const { workspace } = useParams<{workspace: string }>();
-  const { data: userData, error, mutate } = useSWR<IUser | false>('http://localhost:3095/api/users', fetcher); 
-  const { data: channelData } = useSWR<IChannel[]>(userData ? `http://localhost:3095/api/workspaces/${workspace}/channels` : null, fetcher);
+  const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher); 
+  const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
+  const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
@@ -149,7 +152,6 @@ const Workspace: FC = () => {
           </span>
         </RightMenu>  
       </Header>
-      <button onClick={onLogout}>로그아웃</button>
       <WorkspaceWrapper>
         <Workspaces>
           {userData?.Workspaces.map(ws => {
@@ -178,6 +180,8 @@ const Workspace: FC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu> 
+            <ChannelList userData={userData} />
+            <DMList userData={userData} />
             { channelData?.map((v, i) => (
               <div key={i}>{v.name}</div>
             )) }
