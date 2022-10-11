@@ -60,7 +60,6 @@ const DMList: FC = () => {
           memberData?.map((member) => {
             const isOnline = onlineList.includes(member.id);
             return (
-              // NavLink ? a href역할을 하는데 activeClassName을 적용하여 selected를 사용할 수 있다.
               <NavLink key={member.id} activeClassName="selected" to={`/workspace/${workspace}/dm/${member.id}`}>
                 <i
                   className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${

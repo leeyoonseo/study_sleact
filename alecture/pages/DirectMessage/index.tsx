@@ -1,13 +1,30 @@
-import Workspace from '@layouts/Workspace';
 import React from 'react'
+import useSWR from 'swr';
+import gravatar from 'gravatar';
+import { useParams } from 'react-router';
+import fetcher from '@utils/fetcher';
+import ChatBox from '@components/ChatBox';
+import { Container, Header } from './styles';
+import ChatList from '@components/ChatList';
 
 const DirectMessage = () => {
+  const { workspace, id } = useParams<{ workspace: string, id: string }>();
+  const { data: userData } = useSWR(`/api/workspaces/${workspace}/users/${id}`, fetcher);
+  const { data: myData } = useSWR('/api/users', fetcher);
+
+  if (!userData || !myData) {
+    return null;
+  }
+  
   return (
-    // 컴포넌트1. 각각의 layout을 가져와서 감싸는 방법
-    // <Workspace>
-    //   <div>로그인하신 것을 축하드려요!</div>
-    // </Workspace>
-    <div>로그인하신 것을 축하드려요!</div>
+    <Container>
+      <Header>
+        <img src={gravatar.url(userData.email, { s: '24px', d: 'retro' })} alt={userData.nickname} />
+        <span>{userData.nickname}</span>
+      </Header>
+      <ChatList />
+      <ChatBox chat={''} />
+    </Container>
   )
 }
 
