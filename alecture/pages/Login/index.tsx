@@ -46,7 +46,7 @@ const LogIn = () => {
       setLogInError(false);
       axios
         .post(
-          'http://localhost:3095/api/users/login',
+          '/api/users/login',
           { email, password },
           {
             // back, front 서버 주소가 다르면(도메인이 다르면) cookie 전달이 안되는 문제 발생

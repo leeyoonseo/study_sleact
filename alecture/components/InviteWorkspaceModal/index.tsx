@@ -36,7 +36,7 @@ const inviteWorkspaceModal: FC<Props> = ({ show, onCloseModal, setShowInviteWork
       return;
     }
 
-    axios.post(`http://localhost:3095/api/workspaces/${workspace}/members`, {
+    axios.post(`/api/workspaces/${workspace}/members`, {
       email: newMember,
     }, {
       withCredentials: true,

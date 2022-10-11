@@ -80,7 +80,7 @@ const Workspace: FC = () => {
     if (!newUrl || !newUrl.trim()) return;
     if (!newWorkspace) return;
 
-    axios.post('http://localhost:3095/api/workspaces', {
+    axios.post('/api/workspaces', {
       workspace: newWorkspace,
       url: newUrl
     }, {

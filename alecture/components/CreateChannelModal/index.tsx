@@ -34,7 +34,7 @@ const CreateChannelModal: FC<Props> = ({ show, onCloseModal, setShowCreateChanne
 
   const onCreateChannel = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    axios.post(`http://localhost:3095/api/workspaces/${workspace}/channels`, {
+    axios.post(`/api/workspaces/${workspace}/channels`, {
       name: newChannel,
     }, {
       withCredentials: true,
