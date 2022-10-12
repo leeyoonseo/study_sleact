@@ -49,11 +49,21 @@ const Workspace: FC = () => {
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   
   useEffect(() => {
-    // useSocket Example
-    // socket.on('message');
-    // socket.emit();
-    // disconnect();
-  }, []);
+    if(channelData && userData && socket) {
+      console.log('socket :>> ', socket);
+      socket.emit('login', { 
+        id: userData.id, 
+        channels: channelData.map(v => v.id)  
+      });
+    }
+  }, [socket, channelData, userData]);
+
+  useEffect(() => {
+    // workspace가 바뀔때, cleanup
+    return () => {
+      disconnect();
+    }
+  }, [workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
