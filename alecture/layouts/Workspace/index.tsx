@@ -1,6 +1,6 @@
 import fetcher from '@utils/fetcher';
 import axios from 'axios';
-import React, { MouseEvent, FC, useCallback, useState } from 'react';
+import React, { MouseEvent, FC, useCallback, useState, useEffect } from 'react';
 import { Redirect, Route, Switch, useParams } from 'react-router';
 import useSWR from 'swr';
 // mutate 여기에 있는 것은 범용적으로 쓸 수 있는 mutate
@@ -25,6 +25,7 @@ import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
 import InviteChannelModal from '@components/InviteChannelModal';
 import ChannelList from '@components/ChannelList';
 import DMList from '@components/DMList';
+import useSocket from '@hooks/useSocket';
 
 const Channel = loadable(() => import('@pages/Channel'));
 const DirectMessage = loadable(() => import('@pages/DirectMessage'));
@@ -33,6 +34,8 @@ const Workspace: FC = () => {
   // swr들이 컴포넌트간의 전역 스토리지 역할
   // <IUser | false> -> 로그인이 안되면 false기 때문에
   const { workspace } = useParams<{workspace: string }>();
+  const [socket, disconnect] = useSocket(workspace);
+
   const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher); 
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
@@ -45,6 +48,13 @@ const Workspace: FC = () => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput('');
   
+  useEffect(() => {
+    // useSocket Example
+    // socket.on('message');
+    // socket.emit();
+    // disconnect();
+  }, []);
+
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null, {
       withCredentials: true, // 쿠키 공유
@@ -253,3 +263,6 @@ const Workspace: FC = () => {
 export default Workspace;
 // 그라바타 -> 아바타 랜덤 시스템 (이메일과 1:1 매칭?)
 // npm i gravatar @types/gravatar
+
+// 3까지 나왔으나, back에서 nest, typeorm? => 버전문제로 강의에서는 2버전 사용
+// npm i socket.io-client@2
