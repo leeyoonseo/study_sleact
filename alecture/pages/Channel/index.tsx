@@ -35,14 +35,6 @@ const Channel = ({ }) => {
       <ChatList 
         ref={scrollbarRef}
         setSize={setSize}
-        isEmpty={isEmpty}
-        isReachingEnd={isReachingEnd}
-        chatSections={chatSections} 
-      />
-      <ChatList 
-        ref={scrollbarRef}
-        setSize={setSize}
-        isEmpty={isEmpty}
         isReachingEnd={isReachingEnd}
         chatSections={chatSections} 
       />
