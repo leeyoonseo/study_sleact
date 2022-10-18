@@ -25,10 +25,9 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isReach
           // 스크롤 위치 유지
           const current = (ref as MutableRefObject<Scrollbars>)?.current;
           if (current) {
-            // TODO: 타이밍때문에 안되서 임시로 settimeout
             setTimeout(() => {
               current.scrollTop(current.getScrollHeight() - values.scrollHeight);
-            }, 0);
+            }, 50);
           }
         });
       }

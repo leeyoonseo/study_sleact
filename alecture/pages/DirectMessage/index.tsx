@@ -12,6 +12,7 @@ import axios from 'axios';
 import { IDM } from '@typings/db';
 import makeSection from '@utils/makeSection';
 import Scrollbars from 'react-custom-scrollbars';
+import useSocket from '@hooks/useSocket';
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string, id: string }>();
@@ -19,6 +20,8 @@ const DirectMessage = () => {
   const { data: myData } = useSWR('/api/users', fetcher);
   const scrollbarRef = useRef<Scrollbars>(null);
   const [chat, onChangeChat, setChat] = useInput('');
+  const [socket] = useSocket(workspace);
+
   // useSWR -> useSWRInfinite 변경
   // const { data: chatData, mutate: mutateChat } = useSWR<IDM[]>(
   //   `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`,
@@ -72,6 +75,42 @@ const DirectMessage = () => {
       .catch(console.error);
     }
   }, [chat, chatData, myData, userData, workspace, id]);
+
+  const onMessage = useCallback((data: IDM) => {
+    // id는 상대방 아이디 
+    // 내 id가 아닌것만 mutateChat 진행: 왜? 내 id까지 할 경우 onSubmit과 중복이기 때문에, 2개의 데이터가 저장됨
+    if (data.SenderId === Number(id) && myData.id !== Number(id)) {
+      // socket.io가 서버로부터 실시간으로 데이터를 가져오는데,
+      // 그것을 다시 서버에 요청할 이유는 없다. ===> revalidate할 필요없다 (난 어차피 안썼다.)
+      mutateChat((chatData) => {
+        // 가장 최신 데이터 삽입
+        chatData?.[0].unshift(data);
+        return chatData;
+      }, false).then(() => {
+        // 스크롤바 조정 
+        // 남이 보내는 채팅일 경우 스크롤바가 내려가지 않도록 150px로 기준을 잡았다. (150px보다 위에 스크롤을 올렸을 경우, 내 채팅 스크롤에 영향을 주지 않는다.)
+        if (scrollbarRef.current) {
+          if (
+            scrollbarRef.current.getScrollHeight() <
+            scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
+          ) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            setTimeout(() => {
+              scrollbarRef.current?.scrollToBottom();
+            }, 50);
+          }
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    socket?.on('dm', onMessage);
+
+    return () => {
+      socket?.off('dm', onMessage);
+    }
+  }, [socket, onMessage]);
 
   // 로딩 시 스크롤바 제일 아래로
   useEffect(() => {
