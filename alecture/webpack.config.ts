@@ -15,7 +15,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 const config: Configuration = {
   name: 'sleact',
   mode: isDevelopment ? 'development' : 'production',
-  devtool: !isDevelopment ? 'hidden-source-map' : 'eval', // or inline-source-map
+  devtool: !isDevelopment ? 'hidden-source-map' : 'eval', // eval or inline-source-map
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'], // babel이 처리할 확장자 목록
     alias: { 
@@ -110,10 +110,13 @@ const config: Configuration = {
 if (isDevelopment && config.plugins) {
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
   config.plugins.push(new ReactRefreshWebpackPlugin());
+  // 개발 시 서버에 따로 띄워서 보이게
   config.plugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: true }));
 }
 if (!isDevelopment && config.plugins) {
+  // 요즘 영향이 없다고함 -> 옛날 플러그인때문에 테스트 겸 추가한듯?
   config.plugins.push(new webpack.LoaderOptionsPlugin({ minimize: true }));
+  // 배포 시 서버를 따로 띄울수 없기 때문에 html로 결과물 출력
   config.plugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'static' }));
 }
 
