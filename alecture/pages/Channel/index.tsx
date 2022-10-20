@@ -1,25 +1,31 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
- import ChatBox from '@components/ChatBox';
+import ChatBox from '@components/ChatBox';
 import ChatList from '@components/ChatList';
+import InviteChannelModal from '@components/InviteChannelModal';
 import useInput from '@hooks/useInput';
-import { Container, Header } from './styles';
-import makeSection from '@utils/makeSection';
-import { useParams } from 'react-router';
-import fetcher from '@utils/fetcher';
-import useSWRInfinite from "swr/infinite";
-import { IChannel, IChat, IUser } from '@typings/db';
-import Scrollbars from 'react-custom-scrollbars';
-import useSWR from 'swr';
 import useSocket from '@hooks/useSocket';
+import { Container, Header } from '@pages/Channel/styles';
+import { IChannel, IChat, IUser } from '@typings/db';
+import fetcher from '@utils/fetcher';
+import makeSection from '@utils/makeSection';
 import axios from 'axios';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Scrollbars from 'react-custom-scrollbars';
+import { useParams } from 'react-router';
+import useSWR from 'swr';
+import useSWRInfinite from "swr/infinite";
+
+// 인터넷 환경에 따라서 상황(순서)이 달라질 수 있다. -> 때문에 서버에 저장된 후에 옳바른 순서를 노출해줘야한다. (검증 실패시 제거해야함)
+// 0초 A: 안녕~(optimistic UI)
+// 1초 B: 안녕~
+// 2초 A: 안녕~(실제 서버)
 
 const Channel = () => {
-  const { workspace, channel } = useParams<{ workspace: string, channel: string }>();
+  const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
   const { data: myData } = useSWR('/api/users', fetcher);
-  const { data: channelData } = useSWR<IChannel>(`/api/workspaces/${workspace}/users/${channel}`, fetcher);
-  const scrollbarRef = useRef<Scrollbars>(null);
-  const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [chat, onChangeChat, setChat] = useInput('');
+  const scrollbarRef = useRef<Scrollbars>(null);
+  const { data: channelData } = useSWR<IChannel>(`/api/workspaces/${workspace}/channels/${channel}`, fetcher);
+  const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
   const [socket] = useSocket(workspace);
 
   // useSWR -> useSWRInfinite 변경
@@ -33,7 +39,7 @@ const Channel = () => {
     // [{ id: 1, id: 2, id: 3, id: 4 }] -> [[{ id: 1, id: 2 }]] -> [[{ id: 3, id: 4 }],[{ id: 1, id: 2 }]]
 
     // 함수로 바뀌고 index로 페이지 수 전달
-    (index: number) => `/api/workspaces/${workspace}/dms/${channel}/chats?perPage=20&page=${index + 1}`,
+    (index) => `/api/workspaces/${workspace}/channels/${channel}/chats?perPage=20&page=${index + 1}`,
     fetcher,
   );
 

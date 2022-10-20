@@ -1,11 +1,11 @@
-import { IDM } from '@typings/db';
+import { IChat, IDM } from '@typings/db';
 import dayjs from 'dayjs';
 
 interface Sections {
-  [key: string ]: IDM[];
+  [key: string ]: (IDM | IChat)[];
 }
 
-export default function makeSection(chatList: IDM[]) {
+export default function makeSection(chatList: (IDM | IChat)[]) {
   const sections: Sections = {};
 
   chatList.forEach((chat) => {

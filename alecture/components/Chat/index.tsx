@@ -1,18 +1,18 @@
 import React, { FC, memo, useMemo } from 'react'
 import gravatar from 'gravatar';
-import { IDM } from '@typings/db';
+import { IChat, IDM } from '@typings/db';
 import { ChatWrapper } from './styles'
 import dayjs from 'dayjs';
 import regexifyString from 'regexify-string';
 import { Link, useParams } from 'react-router-dom';
 
 interface Props {
-  data: IDM;
+  data: IDM | IChat;
 }
 
 const Chat: FC<Props> = ({ data }) => {
   const { workspace } = useParams<{workspace: string }>();
-  const user = data.Sender;
+  const user = 'Sender' in data ? data.Sender : data.User;
   const createdAt = dayjs(data.createdAt).format('h:mm A');
 
   // 정규표현식이 성능에 좋지는 않다.
