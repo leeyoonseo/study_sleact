@@ -2,5 +2,5 @@ zerocho 강의 학습 repo입니다.
 강의 repo: https://github.com/ZeroCho/sleact 
 
 
-// TODO:
-// 모달만들기- 19분부터 보기
+swr 디버깅 참고
+- @jjordy/swr-devtools (https://www.npmjs.com/package/@jjordy/swr-devtools) - 공식지원은 아님
