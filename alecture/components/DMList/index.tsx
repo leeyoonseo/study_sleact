@@ -63,6 +63,7 @@ const DMList: FC = () => {
           memberData?.map((member) => {
             const isOnline = onlineList.includes(member.id);
             return (
+              // <EachDM key={member.id} member={member} isOnline={isOnline} />
               <NavLink key={member.id} activeClassName="selected" to={`/workspace/${workspace}/dm/${member.id}`}>
                 <i
                   className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${

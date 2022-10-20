@@ -34,8 +34,10 @@ const ChannelList: FC = () => {
       </h2>
       <div>
         {!channelCollapse &&
+          // return 하는 컴포넌트를 별도로 분리하면 최적화하기 쉽다.
           channelData?.map((channel) => {
             return (
+              // <EachChannel key={channel.id} channel={channel} />
               <NavLink
                 key={channel.name}
                 activeClassName="selected"

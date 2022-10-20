@@ -75,6 +75,8 @@ const Channel = () => {
         });
         return prevChatData;
       }, false).then(() => { // optimistic ui(낙관적 ui)일때는 shouldRevalidate를 false해줘야함
+        // 채팅을 쳤을 때도 시각을 업데이트
+        // localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
         setChat('');
         scrollbarRef.current?.scrollToBottom();
       });
@@ -127,6 +129,13 @@ const Channel = () => {
       socket?.off('message', onMessage);
     }
   }, [socket, onMessage]);
+
+  // 페이지가 로딩될때, 현재 시간을 기록함. (localStorage에 저장)
+  // 채널 입장 시 현재 시각이 기록되며, 채팅을 읽은 기록
+  // 채팅창 입장 시간 기록 -> 채팅 입력 -> 다시 기록 (왜? 채팅 쳤을때 내 시각을 기록하지 않으면, 내가 작성한 채팅마저 읽지 않은 형식이 됨)
+  // useEffect(() => {
+  //   localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
+  // }, [workspace, channel]);
 
   // 로딩 시 스크롤바 제일 아래로
   useEffect(() => {
