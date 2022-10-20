@@ -1,14 +1,14 @@
+import React, { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import ChatBox from '@components/ChatBox';
 import ChatList from '@components/ChatList';
 import InviteChannelModal from '@components/InviteChannelModal';
 import useInput from '@hooks/useInput';
 import useSocket from '@hooks/useSocket';
-import { Container, Header } from '@pages/Channel/styles';
+import { Container, DragOver, Header } from '@pages/Channel/styles';
 import { IChannel, IChat, IUser } from '@typings/db';
 import fetcher from '@utils/fetcher';
 import makeSection from '@utils/makeSection';
 import axios from 'axios';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import { useParams } from 'react-router';
 import useSWR from 'swr';
@@ -20,6 +20,7 @@ import useSWRInfinite from "swr/infinite";
 // 2초 A: 안녕~(실제 서버)
 
 const Channel = () => {
+  const [dragOver, setDragOver] = useState(false);
   const { workspace, channel } = useParams<{ workspace: string; channel: string }>();
   const { data: myData } = useSWR('/api/users', fetcher);
   const [chat, onChangeChat, setChat] = useInput('');
@@ -91,7 +92,10 @@ const Channel = () => {
   const onMessage = useCallback((data: IChat) => {
     // id는 상대방 아이디 
     // 내 id가 아닌것만 mutateChat 진행: 왜? 내 id까지 할 경우 onSubmit과 중복이기 때문에, 2개의 데이터가 저장됨
-    if (data.Channel.name === channel && data.UserId !== myData?.id) {
+    if (
+      data.Channel.name === channel && 
+      (data.content.startsWith('uploads\\') || data.UserId !== myData?.id) // 이미지 업로드는 optimistic ui가 아니기 때문에 조건이 추가되어야함
+    ) {
       // socket.io가 서버로부터 실시간으로 데이터를 가져오는데,
       // 그것을 다시 서버에 요청할 이유는 없다. ===> revalidate할 필요없다 (난 어차피 안썼다.)
       mutateChat((chatData) => {
@@ -139,6 +143,42 @@ const Channel = () => {
     setShowInviteChannelModal(false);
   }, []);
 
+  const onDrop = useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    // 서버로 파일을 보낼때, formdata를 많이 사용
+    const formData = new FormData();
+
+    // 참조: mdn
+    if (e.dataTransfer.items) {
+      for (let i = 0; i < e.dataTransfer.items.length; i++) {
+        if (e.dataTransfer.items[i].kind === 'file') {
+          const file = e.dataTransfer.items[i].getAsFile();
+          console.log(e, '.... file[' + i + '].name = ' + file?.name);
+          formData.append('image', file!);
+        }
+      }
+    } else {
+      for (let i = 0; i < e.dataTransfer.files.length; i++) {
+        console.log(e, '... file[' + i + '].name = ' + e.dataTransfer.files[i].name);
+        formData.append('image', e.dataTransfer.files[i]);
+      }
+    }
+
+    axios.post(
+      `/api/workspaces/${workspace}/channels/${channel}/images`, 
+      formData
+    ).then(() => {
+      setDragOver(false);
+    });
+  }, [workspace, channel]);
+
+  const onDragOver= useCallback((e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    console.log(e);
+    setDragOver(true);
+  }, []);
+
+
   if (!myData) {
     return null;
   }
@@ -149,7 +189,10 @@ const Channel = () => {
   const chatSections = makeSection(chatData ? [...chatData].flat().reverse() : []);
   
   return (
-    <Container>
+    <Container 
+      onDrop={onDrop} 
+      onDragOver={onDragOver}
+    >
       <Header>
         <span>#{channel}</span>
         <div className="header-right">
@@ -181,7 +224,7 @@ const Channel = () => {
         onCloseModal={onCloseModal}
         setShowInviteChannelModal={setShowInviteChannelModal}
       />
-      {/* {dragOver && <DragOver>업로드!</DragOver>} */}
+      {dragOver && <DragOver>업로드!</DragOver>}
 
     </Container>
   )

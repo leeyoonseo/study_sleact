@@ -9,6 +9,7 @@ import { Link, useParams } from 'react-router-dom';
 interface Props {
   data: IDM | IChat;
 }
+const BACK_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3095' : 'https://sleac.nodebird.com';
 
 const Chat: FC<Props> = ({ data }) => {
   const { workspace } = useParams<{workspace: string }>();
@@ -16,7 +17,11 @@ const Chat: FC<Props> = ({ data }) => {
   const createdAt = dayjs(data.createdAt).format('h:mm A');
 
   // 정규표현식이 성능에 좋지는 않다.
-  const result = useMemo(() => regexifyString({
+  const result = useMemo(() => 
+  // uploads\\ 서버주소 => 이미지 채팅
+  data.content.startsWith('uploads\\') ? ( // 문자열에서 \를 표현하려면 \\를 넣어줘야함(두번)
+    <img src={`${BACK_URL}/${data.content}`} style={{ maxHeight: 200 }} />
+  ): regexifyString({
     input: data.content,
     pattern: /@\[(.+?)]\((\d+?)\)|\n/g,
     decorator(match, index) {
